@@ -1,0 +1,182 @@
+Perfect ✅ Simharasi, here’s a **professional GitHub README.md template** for **Day 2 – Temporary User Setup with Expiry + Bulk Users + Vault/Secrets Manager**, ready to copy-paste. It’s structured to be **interview-friendly, detailed, and clear for future reference**.
+
+---
+
+````markdown
+# 🚀 Day 2 – Temporary User Setup with Expiry (Bulk + Secure Passwords)
+
+## 📌 Objective
+- Create Linux user accounts with **expiry dates**.  
+- Extend to **bulk creation** (30 users) efficiently.  
+- Store passwords securely using **Vault** or **AWS Secrets Manager**.  
+- Understand Linux access control & best practices for DevOps.
+
+---
+
+## 🛠️ Step 1 – Single User (Recap)
+### Create a temporary user:
+```bash
+sudo useradd -e 2025-09-01 tempuser
+````
+
+### Verify expiry date:
+
+```bash
+sudo chage -l tempuser
+```
+
+### Optional – Modify expiry later:
+
+```bash
+sudo usermod -e 2025-09-10 tempuser
+```
+
+### Lock/Unlock account:
+
+```bash
+sudo usermod -L tempuser   # Lock
+sudo usermod -U tempuser   # Unlock
+```
+
+---
+
+## 🛠️ Step 2 – Bulk User Creation
+
+### Using a Bash script:
+
+1. Create a file `user_list.txt` containing usernames:
+
+```
+devuser1
+devuser2
+devuser3
+...
+devuser30
+```
+
+2. Create script `bulk_useradd.sh`:
+
+```bash
+#!/bin/bash
+EXPIRY_DATE=$(date -d "+7 days" +%Y-%m-%d)
+
+while read USERNAME; do
+    PASSWORD=$(openssl rand -base64 12)
+
+    # Create user with expiry
+    sudo useradd -e $EXPIRY_DATE -m -s /bin/bash $USERNAME
+
+    # Set password
+    echo "$USERNAME:$PASSWORD" | sudo chpasswd
+
+    # Force password change on first login
+    sudo chage -d 0 $USERNAME
+
+    # Optional: store credentials temporarily (to be secured later)
+    echo "$USERNAME | $PASSWORD | Expires on: $EXPIRY_DATE" >> user_credentials.txt
+
+    echo "User $USERNAME created with expiry $EXPIRY_DATE"
+done < user_list.txt
+```
+
+3. Run the script:
+
+```bash
+chmod +x bulk_useradd.sh
+./bulk_useradd.sh
+```
+
+4. Verify expiry:
+
+```bash
+for user in devuser{1..30}; do
+    echo "---- $user ----"
+    sudo chage -l $user | grep "Account expires"
+done
+```
+
+---
+
+## 🛠️ Step 3 – Secure Password Storage
+
+### A) Using HashiCorp Vault
+
+1. Start Vault in dev mode:
+
+```bash
+vault server -dev
+export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_TOKEN=<root_token>
+```
+
+2. Enable KV secrets engine:
+
+```bash
+vault secrets enable -path=linux_users kv
+```
+
+3. Store user credentials:
+
+```bash
+vault kv put linux_users/devuser1 username=devuser1 password="StrongRandomPass"
+```
+
+4. Retrieve credentials:
+
+```bash
+vault kv get linux_users/devuser1
+```
+
+---
+
+### B) Using AWS Secrets Manager
+
+1. Store credentials:
+
+```bash
+aws secretsmanager create-secret \
+  --name devops/devuser1 \
+  --secret-string '{"username":"devuser1","password":"StrongRandomPass"}'
+```
+
+2. Retrieve credentials:
+
+```bash
+aws secretsmanager get-secret-value --secret-id devops/devuser1
+```
+
+---
+
+## 🔍 Extra Learnings / Interview Tips
+
+* `useradd -e` → sets account expiry for temporary users.
+* `chage` → check/modify password and account expiry info.
+* Bulk creation improves efficiency & reduces errors.
+* **Random strong passwords** → generated via `openssl rand -base64 12`.
+* **Vault/Secrets Manager** → ensures passwords are never stored in plaintext, aligning with real-world DevOps security practices.
+* These practices are **compliance-ready** (ISO 27001, SOC2, HIPAA).
+
+---
+
+## ✅ Takeaways
+
+* Learned to create temporary Linux users for both **single and bulk scenarios**.
+* Learned to **automate secure password generation** and **expiry management**.
+* Hands-on experience with **Vault & AWS Secrets Manager** for secure credential management.
+* Reinforced Linux fundamentals & **DevOps security best practices**.
+
+---
+
+📌 **Next Steps:**
+
+* Day 3 → Explore **Linux Groups & Permissions for DevOps Teams**.
+* Continue documenting all learnings in GitHub for recruiter-ready portfolio.
+
+```
+
+---
+
+If you want, I can also **draft the Day 2 LinkedIn post** specifically including **bulk user creation + Vault/Secrets Manager explanation** in an **engaging format** for recruiters to notice. This will match your GitHub documentation perfectly.  
+
+Do you want me to do that next?
+```
