@@ -1,0 +1,53 @@
+📌 Day 1 – Linux User Setup with Non-Interactive Shell
+🛠️ GitHub Documentation / README
+
+Objective
+
+Create a Linux user with a non-interactive shell.
+
+Understand Linux /etc/passwd entries and user shells.
+
+Build foundational Linux skills for DevOps.
+
+Step 1 – Create a User with Non-Interactive Shell
+sudo useradd -s /usr/sbin/nologin demo_user
+
+
+✅ Explanation:
+
+-s /usr/sbin/nologin → assigns a non-interactive shell, preventing login.
+
+Useful for service accounts or temporary users that should not have shell access.
+
+Step 2 – Verify User Shell
+grep demo_user /etc/passwd
+
+
+Sample output:
+
+demo_user:x:1001:1001::/home/demo_user:/usr/sbin/nologin
+
+
+Shows the home directory and assigned shell.
+
+Step 3 – Alternative Shells
+
+/bin/bash → interactive shell
+
+/usr/sbin/nologin → disables login (non-interactive)
+
+/bin/false → another method to disable shell
+
+Extra Learnings (DevOps Perspective)
+
+Service users or automation accounts often use non-interactive shells for security.
+
+Prevents accidental logins while still allowing cron jobs, scripts, or service operations.
+
+Commands like usermod -s /bin/bash username can change shell later.
+
+Takeaway
+
+Learned Linux user creation, shell assignment, and /etc/passwd structure.
+
+Foundation for secure user management in DevOps workflows.
